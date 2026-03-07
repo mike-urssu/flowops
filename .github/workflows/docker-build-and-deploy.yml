@@ -67,3 +67,13 @@ jobs:
 
           cache-from: type=registry,ref=${{ env.IMAGE_NAME }}:buildcache
           cache-to: type=registry,ref=${{ env.IMAGE_NAME }}:buildcache,mode=max
+
+      # Jenkins 배포
+      - name: Trigger Jenkins
+        run: |
+          CRUMB=$(curl -s 'https://builds.jjoon.cloud/crumbIssuer/api/xml?xpath=concat(//crumbRequestField,":",//crumb)' \
+            --user deploy:${{ secrets.JENKINS_TOKEN }})
+            
+          curl -X POST "https://builds.jjoon.cloud/job/flowops/build?token=GITHUB_TRIGGER" \
+            -H "$CRUMB" \
+            --user deploy:${{ secrets.JENKINS_TOKEN }}
