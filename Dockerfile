@@ -1,16 +1,17 @@
-# build stage
+# build
 FROM node:20-alpine AS builder
 
 WORKDIR /app
+
 COPY package*.json ./
-RUN npm install
+RUN npm ci
 
 COPY . .
-RUN npm run build
+RUN GENERATE_SOURCEMAP=false npm run build
 
-# runtime stage
-FROM nginx:alpine
+# runtime
+FROM caddy:2.11.2-alpine
 
-COPY --from=builder /app/dist /usr/share/nginx/html
+COPY --from=builder /app/build /usr/share/caddy
 
 EXPOSE 80

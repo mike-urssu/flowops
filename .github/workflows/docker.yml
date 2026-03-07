@@ -19,6 +19,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # Node 설치 + npm cache
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
       # QEMU → ARM 빌드 가능
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -44,6 +51,7 @@ jobs:
           tags: |
             type=raw,value=latest
             type=sha
+            type=ref,event=branch
 
       # Build & Push
       - name: Build and push
@@ -51,7 +59,11 @@ jobs:
         with:
           context: .
           push: true
+
           platforms: linux/amd64,linux/arm64
+
           tags: ${{ steps.meta.outputs.tags }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          labels: ${{ steps.meta.outputs.labels }}
+
+          cache-from: type=registry,ref=${{ env.IMAGE_NAME }}:buildcache
+          cache-to: type=registry,ref=${{ env.IMAGE_NAME }}:buildcache,mode=max
