@@ -10,8 +10,11 @@ COPY . .
 RUN GENERATE_SOURCEMAP=false npm run build
 
 # runtime
-FROM caddy:2.11.2-alpine
+FROM nginx:alpine
 
-COPY --from=builder /app/dist /usr/share/caddy
+COPY --from=builder /app/dist /usr/share/nginx/html
+
+# SPA 라우팅 처리
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 80
