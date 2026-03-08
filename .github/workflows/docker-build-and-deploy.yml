@@ -70,4 +70,11 @@ jobs:
 
       # Jenkins 배포
       - name: Trigger Jenkins
-        run: curl -X POST https://builds.jjoon.cloud/job/flowops/build?token=${{ secrets.JENKINS_TRIGGER }}
+        run: |
+          CRUMB=$(curl -s -u "${{ secrets.JENKINS_USER }}:${{ secrets.JENKINS_TOKEN }}" \
+            https://builds.jjoon.cloud/crumbIssuer/api/xml?xpath=concat\(//crumbRequestField,":",//crumb\))
+
+          curl -X POST \
+            -u "${{ secrets.JENKINS_USER }}:${{ secrets.JENKINS_TOKEN }}" \
+            -H "$CRUMB" \
+            https://builds.jjoon.cloud/job/flowops/build
