@@ -4,11 +4,15 @@ pipeline {
     stages {
         stage('Deploy') {
             steps {
-                sh '''
-                docker pull ghcr.io/mike-urssu/flowops:latest
-                cd /home/jjoon/server/flowops
-                docker compose up -d
-                '''
+                sshagent(credentials: ['deploy-ssh']) {
+                    sh '''
+                    ssh -o StrictHostKeyChecking=no home "
+                    cd ~/server/flowops &&
+                    docker compose pull &&
+                    docker compose up -d --remove-orphans
+                    "
+                    '''
+                }
             }
         }
     }
