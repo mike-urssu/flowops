@@ -1,7 +1,26 @@
 pipeline {
-    agent any
+    agent {
+        label 'macbook'
+    }
+
+    options {
+        skipDefaultCheckout(true)
+    }
 
     stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'main',
+                    url: 'https://github.com/mike-urssu/flowops.git'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh 'docker build -t flowops .'
+            }
+        }
+
         stage('Deploy') {
             steps {
                 sshagent(credentials: ['deploy-ssh']) {
