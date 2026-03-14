@@ -1,23 +1,23 @@
-# # build
-# FROM node:20 AS builder
+# build
+FROM node:20 AS builder
 
-# WORKDIR /app
+WORKDIR /app
 
-# COPY package*.json ./
-# RUN npm ci
+COPY package*.json ./
+RUN npm ci
 
-# COPY . .
-# RUN GENERATE_SOURCEMAP=false npm run build
+COPY . .
+RUN GENERATE_SOURCEMAP=false npm run build
 
-# # runtime
-# FROM nginx:alpine
+# runtime
+FROM nginx:alpine
 
-# COPY --from=builder /app/dist /usr/share/nginx/html
+COPY --from=builder /app/dist /usr/share/nginx/html
 
-# # SPA 라우팅 처리
-# COPY nginx.conf /etc/nginx/conf.d/default.conf
+# SPA 라우팅 처리
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# EXPOSE 80
+EXPOSE 80
 
 FROM nginx:alpine
 
